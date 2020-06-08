@@ -26,7 +26,7 @@ To use the application please follow this procedure:
 4. Edit ``recources\js\bootstrap.js`` file
     * Uncomment the ``laravel-echo`` section.
         Either using it with socket.io or pusher.
-    * Run ``npm run dev`` to generate the js files to ``\public`` folder.
+    * Run ``npm run dev`` to compiler the js files to ``\public`` folder.
 
 5. To run:
     * Start artisan server ``php arisan serve``
