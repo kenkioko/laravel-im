@@ -65,7 +65,7 @@
     Echo.private(`instant-messaging.{{ Auth::user()->id }}`)
         .listen('.instant-messaging', (e) => {
             console.log(e, 'Showing Message ...!');
-            display_message(e.message.message, e.message.sender.name);
+            display_message(e.message, e.user.name);
         });
 </script>
 

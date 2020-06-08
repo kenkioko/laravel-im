@@ -11,8 +11,8 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
-    <script type="text/javascript">
-        window.process = {
+    <script type="text/javascript" defer>
+        window.laravel = {
             env: {
                 MIX_PUSHER_APP_KEY: "{{ env('PUSHER_APP_KEY', '') }}",
                 MIX_PUSHER_APP_CLUSTER: "{{ env('PUSHER_APP_CLUSTER', '') }}",

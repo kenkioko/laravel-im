@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -32,9 +33,10 @@ class InstantMessaging implements ShouldBroadcast
     /**
      * Create a new event instance.
      *
+     * @param \App\Message $message
      * @return void
      */
-    public function __construct($message)
+    public function __construct(Message $message)
     {
         $this->message = $message;
     }
@@ -58,5 +60,21 @@ class InstantMessaging implements ShouldBroadcast
     {
         return 'instant-messaging';
     }
-}
 
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return [
+            'message' => $this->message->message,
+            'created_at' => $this->message->created_at->toFormattedDateString(),
+            'user' => [
+                'id' => $this->message->sender->id,
+                'name' => $this->message->sender->name,
+            ],
+        ];
+    }
+}

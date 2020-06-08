@@ -60,7 +60,7 @@ class MessageController extends Controller
         $message->save();
 
         // broadcast message
-        event(new InstantMessaging($message));
+        broadcast(new InstantMessaging($message))->toOthers();
 
         // return back()->with([
         //     'users' => User::all(),
