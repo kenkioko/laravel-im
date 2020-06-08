@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('messages', 'MessageController');
-
-Auth::routes();
-
 Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('messages', 'MessageController');

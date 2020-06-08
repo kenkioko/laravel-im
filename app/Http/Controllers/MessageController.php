@@ -2,11 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Message;
+use App\Events\InstantMessaging;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +27,7 @@ class MessageController extends Controller
      */
     public function index()
     {
-        return view('messaging');
+        return view('messaging')->with('users', User::all());
     }
 
     /**
@@ -37,12 +50,26 @@ class MessageController extends Controller
     {
         $validatedData = $request->validate([
             'message' => ['required','string','max:255'],
+            'receiver' => ['required','exists:App\User,id']
         ]);
 
-        dd($validatedData);
+        // create and save message
+        $message = new Message($validatedData);
+        $message->sender()->associate(Auth::user());
+        $message->receiver()->associate(User::findOrFail($validatedData['receiver']));
+        $message->save();
 
-        // $message = new Message;
-        // event(new InstantMessaging($message));
+        // broadcast message
+        event(new InstantMessaging($message));
+
+        // return back()->with([
+        //     'users' => User::all(),
+        //     'success' => 'Message sent!',
+        // ]);
+
+        return response()->json([
+            'success' => 'Message sent!',
+        ]);
     }
 
     /**

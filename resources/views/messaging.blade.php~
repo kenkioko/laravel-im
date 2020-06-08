@@ -1,50 +1,68 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.app')
 
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+@section('content')
+<div class="container">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong> Errors Occured </strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <title>Laravel IM</title>
-    </head>
+    @if (session('success'))
+        <div class="alert alert-success">
+            <strong> {{ session('success') }} </strong>
+        </div>
+    @endif
 
-    <body>
+    <form method="post" action="{{ route('messages.store') }}">
+        @csrf
 
-    <div class="container">
-        <form method="post" action="{{ route('messages.store') }}" onsubmit="">
-            @csrf
+        <div class="form-group">
+            <label for="messageTextArea">Type your message</label>
+            <textarea class="form-control @error('message') is-invalid @enderror" id="messageTextArea" rows="10" name="message"></textarea>
 
-            <div class="form-group">
-                <label for="messageTextArea">Type your message</label>
-                <textarea class="form-control" id="messageTextArea" rows="3" name="message"></textarea>
-            </div>
+            @error('message')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+        <div class="form-group">
+            <label for="receiverSelect">Select user to send message</label>
+            <select class="form-control @error('receiver') is-invalid @enderror"" id="receiverSelect" name="receiver">
+                <option>Choose Receiver...</option>
 
-    <!-- Bootstrap Required Js -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+                @foreach ($users as $user)
+                    @if ($user != Auth::user())
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endif
+                @endforeach
+            </select>
 
-    <!-- Listener for Event Broadcasts -->
-    <script src="{{ asset('js/bootstrap.js') }}"></script>
-    <script type="text/javascript">
-        Echo.private(`instant-messaging.${message_id}`)
-            .listen('.instant-messaging', (e) => {
-                console.log(e.update);
-            });
-    </script>
+            @error('receiver')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+          </div>
 
-    <!-- post form message -->
-    <script type="text/javascript">
-      function send_message() {
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
 
-      }
-    </script>
+<!-- Listener for Event Broadcasts -->
+<script src="{{ asset('js/bootstrap.js') }}"></script>
+<script type="text/javascript">
+    Echo.channel(`instant-messaging.{{ Auth::user()->id }}`)
+        .listen('.instant-messaging', (e) => {
+            console.log(e.update, 'what!');
+        });
+</script>
 
-    </body>
-</html>
+@endsection
